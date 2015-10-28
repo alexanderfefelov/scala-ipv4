@@ -45,7 +45,7 @@ class IpAddressPool private(override val first: IpAddress, override val last: Ip
   /**
    * Allocate the first free address in the pool.
    *
-   * @returns the pool after allocation and the allocated address (or None if no address was free)
+   * @return the pool after allocation and the allocated address (or None if no address was free)
    */
   def allocate(): (IpAddressPool, Option[IpAddress]) = {
     if (!isExhausted) {
@@ -62,7 +62,7 @@ class IpAddressPool private(override val first: IpAddress, override val last: Ip
    * Allocate the given address in the pool.
    *
    * @param toAllocate address to allocate in the pool
-   * @returns the pool after allocation and the allocated address (or None if the address was not free in this pool)
+   * @return the pool after allocation and the allocated address (or None if the address was not free in this pool)
    */
   def allocate(toAllocate: IpAddress): (IpAddressPool, Option[IpAddress]) = {
     if (!contains(toAllocate))
@@ -109,7 +109,7 @@ class IpAddressPool private(override val first: IpAddress, override val last: Ip
   /**
    * Deallocate the given address in the pool. The given address will be free in the returned pool.
    *
-   * @returns the pool after deallocation
+   * @return the pool after deallocation
    */
   def deAllocate(address: IpAddress): IpAddressPool = {
     if (!contains(address))
