@@ -1,7 +1,5 @@
 name := "scala-ipv4"
 
-version := "0.3"
-
 organization := "be.jvb.scala-ipv4"
 
 scalaVersion := "2.10.6"
