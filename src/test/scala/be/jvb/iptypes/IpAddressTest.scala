@@ -12,6 +12,7 @@ import java.net.InetAddress
  */
 @RunWith(classOf[JUnitRunner])
 class IpAddressTest extends FunSuite with Checkers {
+
   test("create from string 0.0.0.0") {
     val address = new IpAddress("0.0.0.0")
     assert(0 === address.value)
@@ -124,7 +125,7 @@ class IpAddressTest extends FunSuite with Checkers {
   }
 
   def ipAddressGenerator: Gen[IpAddress] = {
-    for{
+    for {
       value <- Gen.choose(0L, 0xFFFFFFFFL)
     } yield new IpAddress(value)
   }
@@ -132,19 +133,19 @@ class IpAddressTest extends FunSuite with Checkers {
   implicit def arbitraryIpAddress: Arbitrary[IpAddress] = Arbitrary[IpAddress](ipAddressGenerator)
 
   def ipAddressAsString: Gen[String] = {
-    for{
+    for {
       octets <- Gen.listOfN(4, Gen.choose(0, 255))
     } yield octets.mkString(".")
   }
 
   def minIpAddressAsString: Gen[String] = {
-    for{
+    for {
       string <- Gen.listOfN(4, 0)
     } yield string.mkString(".")
   }
 
   def maxIpAddressAsString: Gen[String] = {
-    for{
+    for {
       string <- Gen.listOfN(4, 255)
     } yield string.mkString(".")
   }

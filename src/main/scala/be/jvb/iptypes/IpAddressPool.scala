@@ -16,6 +16,7 @@ import scala.collection.mutable.ListBuffer
  */
 class IpAddressPool private(override val first: IpAddress, override val last: IpAddress, val freeRanges: SortedSet[IpAddressRange])
         extends IpAddressRange(first, last) {
+
   validateFreeRanges(freeRanges)
 
   /**
@@ -34,12 +35,12 @@ class IpAddressPool private(override val first: IpAddress, override val last: Ip
   }
 
   private def validateFreeRanges(toValidate: SortedSet[IpAddressRange]) = {
-    if (!toValidate.isEmpty && !checkWithinBounds(toValidate))
+    if (toValidate.nonEmpty && !checkWithinBounds(toValidate))
       throw new IllegalArgumentException("invalid free ranges: not all within pool range")
   }
 
   private def checkWithinBounds(toValidate: SortedSet[IpAddressRange]): Boolean = {
-    return (toValidate.firstKey.first >= first && toValidate.lastKey.last <= last)
+    toValidate.firstKey.first >= first && toValidate.lastKey.last <= last
   }
 
   /**
@@ -47,14 +48,14 @@ class IpAddressPool private(override val first: IpAddress, override val last: Ip
    *
    * @return the pool after allocation and the allocated address (or None if no address was free)
    */
-  def allocate(): (IpAddressPool, Option[IpAddress]) = {
+  def allocate: (IpAddressPool, Option[IpAddress]) = {
     if (!isExhausted) {
       // get the first range of free addresses, and take the first address of that range
       val range: IpAddressRange = freeRanges.firstKey
       val toAllocate: IpAddress = range.first
-      return doAllocate(toAllocate, range)
+      doAllocate(toAllocate, range)
     } else {
-      return (this, None)
+      (this, None)
     }
   }
 
@@ -71,9 +72,7 @@ class IpAddressPool private(override val first: IpAddress, override val last: Ip
     // go find the range that contains the requested address
     findFreeRangeContaining(toAllocate) match {
       case Some(range) => doAllocate(toAllocate, range) // allocate in the range we found
-      case None => {
-        (this, None) // no free range found for the requested address
-      }
+      case None => (this, None) // no free range found for the requested address
     }
   }
 
@@ -83,14 +82,12 @@ class IpAddressPool private(override val first: IpAddress, override val last: Ip
     val tail = freeRanges.from(new IpAddressRange(toAllocate, toAllocate))
 
     // the range we need is either the first of the tail, or the last of the head, or it doesn't exist
-    if (!head.isEmpty && head.lastKey.contains(toAllocate)) {
-      return Some(head.lastKey)
-    }
-    else if (!tail.isEmpty && tail.firstKey.contains(toAllocate)) {
-      return Some(tail.firstKey)
-    }
-    else {
-      return None
+    if (head.nonEmpty && head.lastKey.contains(toAllocate)) {
+      Some(head.lastKey)
+    } else if (tail.nonEmpty && tail.firstKey.contains(toAllocate)) {
+      Some(tail.firstKey)
+    } else {
+      None
     }
   }
 
@@ -102,8 +99,8 @@ class IpAddressPool private(override val first: IpAddress, override val last: Ip
     // remove the range and replace with ranges without the allocated address
     val newRanges = range - toAllocate
     // note: the cast to SortedSet is a workaround until scala 2.8 (http://stackoverflow.com/questions/1271426/scala-immutable-sortedset-are-not-stable-on-deletion)
-    val remainingRanges = (freeRanges ++ newRanges).asInstanceOf[SortedSet[IpAddressRange]] - range
-    return (new IpAddressPool(this.first, this.last, remainingRanges.asInstanceOf[SortedSet[IpAddressRange]]), Some(toAllocate))
+    val remainingRanges = (freeRanges ++ newRanges) - range
+    (new IpAddressPool(this.first, this.last, remainingRanges.asInstanceOf[SortedSet[IpAddressRange]]), Some(toAllocate))
   }
 
   /**
@@ -115,7 +112,7 @@ class IpAddressPool private(override val first: IpAddress, override val last: Ip
     if (!contains(address))
       throw new IllegalArgumentException("can not deallocate address which is not contained in the range of the pool [" + address + "]")
 
-    return new IpAddressPool(first, last, addAddressToFreeRanges(address))
+    new IpAddressPool(first, last, addAddressToFreeRanges(address))
   }
 
   /**
@@ -128,32 +125,32 @@ class IpAddressPool private(override val first: IpAddress, override val last: Ip
 
     if (freeRangeBeforeAddress.isEmpty && freeRangeAfterAddress.isEmpty) {
       // no match -> nothing to "defragment"
-      return freeRanges + new IpAddressRange(address, address)
+      freeRanges + new IpAddressRange(address, address)
     } else {
-      if (!freeRangeBeforeAddress.isEmpty && !freeRangeAfterAddress.isEmpty) {
+      if (freeRangeBeforeAddress.nonEmpty && freeRangeAfterAddress.nonEmpty) {
         // first and last match -> merge the 2 existing ranges
-        return (freeRanges -
-                freeRangeBeforeAddress.toSeq(0) -
-                freeRangeAfterAddress.toSeq(0) +
-                new IpAddressRange(freeRangeBeforeAddress.toSeq(0).first, freeRangeAfterAddress.toSeq(0).last)).
+        (freeRanges -
+                freeRangeBeforeAddress.head -
+                freeRangeAfterAddress.head +
+                new IpAddressRange(freeRangeBeforeAddress.head.first, freeRangeAfterAddress.head.last)).
                 asInstanceOf[SortedSet[IpAddressRange]] // workaround, see above
-      } else if (!freeRangeBeforeAddress.isEmpty) {
+      } else if (freeRangeBeforeAddress.nonEmpty) {
         // append
-        return (freeRanges -
-                freeRangeBeforeAddress.toSeq(0) +
-                (freeRangeBeforeAddress.toSeq(0) + address)).
+        (freeRanges -
+                freeRangeBeforeAddress.head +
+                (freeRangeBeforeAddress.head + address)).
                 asInstanceOf[SortedSet[IpAddressRange]] // workaround, see above
       } else {
         // prepend
-        return (freeRanges -
-                freeRangeAfterAddress.toSeq(0) +
-                (freeRangeAfterAddress.toSeq(0) + address)).
+        (freeRanges -
+                freeRangeAfterAddress.head +
+                (freeRangeAfterAddress.head + address)).
                 asInstanceOf[SortedSet[IpAddressRange]] // workaround, see above
       }
     }
   }
 
-  def isExhausted(): Boolean = {
+  def isExhausted: Boolean = {
     freeRanges.isEmpty
   }
 
@@ -165,38 +162,38 @@ class IpAddressPool private(override val first: IpAddress, override val last: Ip
   /**
    * @return the number of free ranges fragments
    */
-  def fragments(): Int = {
+  def fragments: Int = {
     freeRanges.size
   }
 
   /**
    * @return a stream of all free addresses in the pool
    */
-  def freeAddresses(): Stream[IpAddress] = {
+  def freeAddresses: Stream[IpAddress] = {
     toAddressesStream(freeRanges.toList)
   }
 
   /**
    * @return a stream of all allocated addresses in the pool
    */
-  def allocatedAddresses(): Stream[IpAddress] = {
-    toAddressesStream(allocatedRanges.toList)
+  def allocatedAddresses: Stream[IpAddress] = {
+    toAddressesStream(allocatedRanges)
   }
 
   /**
    * @return ranges of allocated addresses in the pool
    * @note the pool implementation keeps track of the free addresses, so this operation is more expensive than the freeRanges() one
    */
-  def allocatedRanges(): List[IpAddressRange] = {
+  def allocatedRanges: List[IpAddressRange] = {
     if (freeRanges.isEmpty) {
       // one big range of allocated addresses
       List[IpAddressRange](new IpAddressRange(first, last))
     } else {
-      makeNonEmptyListOfAllocatedRanges()
+      makeNonEmptyListOfAllocatedRanges
     }
   }
 
-  private def makeNonEmptyListOfAllocatedRanges(): List[IpAddressRange] = {
+  private def makeNonEmptyListOfAllocatedRanges: List[IpAddressRange] = {
     val allocatedRanges: ListBuffer[IpAddressRange] = new ListBuffer[IpAddressRange]()
     var currentStart: IpAddress = first
     var currentEnd: IpAddress = null
@@ -210,8 +207,7 @@ class IpAddressPool private(override val first: IpAddress, override val last: Ip
     if (currentStart <= last) { // occurs if the last free range didn't reach until the end of the pool
       allocatedRanges += new IpAddressRange(currentStart, last)
     }
-    return allocatedRanges.toList
-
+    allocatedRanges.toList
   }
 
   //  /**
@@ -227,7 +223,7 @@ class IpAddressPool private(override val first: IpAddress, override val last: Ip
     }
   }
 
-  override def toString(): String = {
+  override def toString: String = {
     "IpAddressPool " + super.toString + " with free ranges " + freeRanges.toString
   }
 

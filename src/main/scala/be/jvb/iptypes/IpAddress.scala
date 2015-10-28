@@ -1,6 +1,6 @@
 package be.jvb.iptypes
 
-import java.net.InetAddress;
+import java.net.InetAddress
 
 /**
  * Represents an IPv4 address.
@@ -10,6 +10,7 @@ import java.net.InetAddress;
  * @param value 32bit value of the ip address (only 32 least significant bits are used)
  */
 class IpAddress(val value: Long) extends SmallByteArray {
+
   /**
    * Construct from a CIDR format string representation (e.g. "192.168.0.1").
    */
@@ -19,7 +20,7 @@ class IpAddress(val value: Long) extends SmallByteArray {
    * Construct from a java.net.InetAddress.
    */
   def this(inetAddress: InetAddress) = {
-    this (if (inetAddress == null) throw new IllegalArgumentException("can not create from [null]") else inetAddress.getHostAddress())
+    this (if (inetAddress == null) throw new IllegalArgumentException("can not create from [null]") else inetAddress.getHostAddress)
   }
 
   protected def nBytes = IpAddress.N_BYTES
@@ -44,13 +45,13 @@ class IpAddress(val value: Long) extends SmallByteArray {
 }
 
 object IpAddress {
+
   val N_BYTES = 4
 
   def apply(string: String): IpAddress = new IpAddress(SmallByteArray.parseAsLong(string, N_BYTES, DEC()))
 
   def unapply(ipAddress: IpAddress): Option[String] = {
-    return Some(ipAddress.toString)
+    Some(ipAddress.toString)
   }
 
 }
-

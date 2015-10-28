@@ -1,7 +1,5 @@
 package be.jvb.iptypes
 
-import java.lang.String
-
 /**
  * Represents an Ipv4 network (i.e. an address and a mask).
  *
@@ -12,6 +10,7 @@ import java.lang.String
  */
 class IpNetwork(val address: IpAddress, val mask: IpNetworkMask)
         extends IpAddressRange(IpNetwork.first(address, mask), IpNetwork.last(address, mask)) {
+
   /**
    * Construct a network from two addresses. This will create the smallest possible network ("longest prefix match") which contains
    * both addresses.
@@ -29,9 +28,11 @@ class IpNetwork(val address: IpAddress, val mask: IpNetworkMask)
    * @return CIDR notation
    */
   override def toString: String = first.toString + "/" + mask.prefixLength
+
 }
 
 object IpNetwork {
+
   /**
    * get the first address from a network which contains the given address.
    */
@@ -55,7 +56,7 @@ object IpNetwork {
     val address = new IpAddress(addressAndMask._1)
     val mask = parseNetworkMask(addressAndMask._2)
 
-    return (address, mask)
+    (address, mask)
   }
 
   private def splitInAddressAndMask(cidrString: String): (String, String) = {
@@ -76,4 +77,5 @@ object IpNetwork {
       case e: Exception => throw new IllegalArgumentException("not a valid network mask [" + mask + "]", e)
     }
   }
+
 }

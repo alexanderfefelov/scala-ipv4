@@ -7,6 +7,7 @@ import org.scalatest.matchers.ShouldMatchers
  * @author <a href="http://janvanbesien.blogspot.com">Jan Van Besien</a>
  */
 class IpAddressExample extends WordSpec with ShouldMatchers {
+
   "An IpAddress" should {
     val address = new IpAddress("192.168.0.1")
 
@@ -68,4 +69,5 @@ class IpAddressExample extends WordSpec with ShouldMatchers {
     }
 
   }
+
 }

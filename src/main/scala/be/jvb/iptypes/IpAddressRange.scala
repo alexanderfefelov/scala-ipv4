@@ -11,6 +11,7 @@ import scala.math.Ordered
  * @param last last address in the range
  */
 class IpAddressRange(val first: IpAddress, val last: IpAddress) extends Ordered[IpAddressRange] {
+
   if (last < first)
     throw new IllegalArgumentException("Cannot create ip address range with last address > first address")
 
@@ -30,7 +31,7 @@ class IpAddressRange(val first: IpAddress, val last: IpAddress) extends Ordered[
     last.value - first.value + 1
   }
 
-  def addresses(): Stream[IpAddress] = {
+  def addresses: Stream[IpAddress] = {
     if (first < last) {
       Stream.cons(first, new IpAddressRange(first + 1, last).addresses)
     } else {
@@ -56,15 +57,15 @@ class IpAddressRange(val first: IpAddress, val last: IpAddress) extends Ordered[
       throw new IllegalArgumentException("invalid address [null]")
 
     if (!contains(address))
-      return List(this)
+      List(this)
     else if (address == first && address == last)
-      return List()
+      List()
     else if (address == first)
-      return List(new IpAddressRange(first + 1, last))
+      List(new IpAddressRange(first + 1, last))
     else if (address == last)
-      return List(new IpAddressRange(first, last - 1))
+      List(new IpAddressRange(first, last - 1))
     else
-      return List(new IpAddressRange(first, address - 1), new IpAddressRange(address + 1, last))
+      List(new IpAddressRange(first, address - 1), new IpAddressRange(address + 1, last))
   }
 
   /**
@@ -99,4 +100,5 @@ class IpAddressRange(val first: IpAddress, val last: IpAddress) extends Ordered[
   override def hashCode = {
     41 * (41 + first.hashCode) + last.hashCode
   }
+
 }

@@ -28,6 +28,7 @@ class MacAddress(val value: Long) extends SmallByteArray {
 }
 
 object MacAddress {
+
   val N_BYTES = 6
 
 //  def apply(string: String): MacAddress = new MacAddress(SmallByteArray.parseAsLong(string, N_BYTES))

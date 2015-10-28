@@ -9,24 +9,25 @@ import org.scalatest.FunSuite
  */
 @RunWith(classOf[JUnitRunner])
 class IpAddressPoolTest extends FunSuite {
+
   test("allocate next") {
     var pool = new IpAddressPool(new IpAddress("1.2.3.4"), new IpAddress("1.2.3.6"))
 
-    pool.allocate() match {
+    pool.allocate match {
       case (p, allocated) => {
         pool = p
         assert(Some(new IpAddress("1.2.3.4")) === allocated)
       }
     }
 
-    pool.allocate() match {
+    pool.allocate match {
       case (p, allocated) => {
         pool = p
         assert(Some(new IpAddress("1.2.3.5")) === allocated)
       }
     }
 
-    pool.allocate() match {
+    pool.allocate match {
       case (p, allocated) => {
         pool = p
         assert(Some(new IpAddress("1.2.3.6")) === allocated)
@@ -37,18 +38,16 @@ class IpAddressPoolTest extends FunSuite {
   test("allocate to exhaustion") {
     var pool = new IpAddressPool(new IpAddress("1.2.3.4"), new IpAddress("1.2.3.4"))
 
-    pool.allocate() match {
-      case (p, allocated) => {
+    pool.allocate match {
+      case (p, allocated) =>
         pool = p
         assert(Some(new IpAddress("1.2.3.4")) === allocated)
-      }
     }
 
-    pool.allocate() match {
-      case (p, allocated) => {
+    pool.allocate match {
+      case (p, allocated) =>
         pool = p
         assert(None === allocated)
-      }
     }
   }
 
@@ -152,11 +151,10 @@ class IpAddressPoolTest extends FunSuite {
     var count = 0
     while (pool.contains(toAllocate)) {
       pool.allocate(toAllocate) match {
-        case (p, allocated) => {
+        case (p, allocated) =>
           pool = p
           assert(allocated === Some(toAllocate))
           count += 1
-        }
       }
       toAllocate += 2
     }

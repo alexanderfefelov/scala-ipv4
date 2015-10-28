@@ -8,6 +8,7 @@ import org.scalatest.WordSpec
  * @author <a href="http://janvanbesien.blogspot.com">Jan Van Besien</a>
  */
 class IpNetworkExample extends WordSpec with ShouldMatchers {
+
   "An ip network" should {
     val network = new IpNetwork(new IpAddress("192.168.0.0"), new IpNetworkMask("255.255.255.0"))
 
@@ -33,7 +34,6 @@ class IpNetworkExample extends WordSpec with ShouldMatchers {
       val range: IpAddressRange = network
       range.contains(new IpAddress("192.168.0.150")) should be(true)
     }
-
-
   }
+
 }

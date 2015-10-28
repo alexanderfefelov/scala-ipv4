@@ -12,6 +12,7 @@ import org.scalatest.prop.Checkers
  */
 @RunWith(classOf[JUnitRunner])
 class IpNetworkMaskTest extends FunSuite with Checkers {
+
   test("mask or prefix construction") {
     assert(new IpNetworkMask("255.255.255.0") === IpNetworkMask.fromPrefixLength(24))
   }

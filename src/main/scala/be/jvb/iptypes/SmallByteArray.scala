@@ -9,6 +9,7 @@ import scala.math.Ordered
  * @author <a href="http://janvanbesien.blogspot.com">Jan Van Besien</a>
  */
 private[iptypes] trait SmallByteArray extends Ordered[SmallByteArray] {
+
   val value: Long
 
   /** How many bytes do we use (max 8). */
@@ -33,7 +34,7 @@ private[iptypes] trait SmallByteArray extends Ordered[SmallByteArray] {
   /**
    * @return integer array of the bytes in this byte array.
    */
-  def toIntArray(): Array[Int] = {
+  def toIntArray: Array[Int] = {
     val ints = new Array[Int](nBytes)
 
     for (i <- 0 until nBytes) {
@@ -42,20 +43,20 @@ private[iptypes] trait SmallByteArray extends Ordered[SmallByteArray] {
 
     ints.foreach((anInt) => assert(anInt >= 0 && anInt <= 255))
 
-    return ints
+    ints
   }
 
   /**
    * @return byte array of the bytes in this byte array.
    */
-  def toByteArray(): Array[Byte] = {
+  def toByteArray: Array[Byte] = {
     val bytes = new Array[Byte](nBytes)
 
     for (i <- 0 until nBytes) {
       bytes(i) = (((value << i * 8) >>> 8 * (nBytes - 1)) & 0xFF).asInstanceOf[Byte]
     }
 
-    return bytes
+    bytes
   }
 
   override def compare(that: SmallByteArray): Int = {
@@ -86,29 +87,28 @@ private[iptypes] trait SmallByteArray extends Ordered[SmallByteArray] {
     val ints = toIntArray
     val strings = for (i <- 0 until nBytes) yield String.format(formatString, ints(i).asInstanceOf[Object])
 
-    return strings.mkString(".")
+    strings.mkString(".")
   }
 
   private lazy val formatString = {
     radix match {
-      case HEX() => {
+      case HEX() =>
         if (zeroPaddingUpTo != 0)
           "%0" + zeroPaddingUpTo + "X"
         else
           "%X"
-      }
-      case DEC() => {
+      case DEC() =>
         if (zeroPaddingUpTo != 0)
           "%0" + zeroPaddingUpTo + "d"
         else
           "%d"
-      }
     }
   }
 
 }
 
 object SmallByteArray {
+
   private[iptypes] def parseAsLong(string: String, length: Int, radix: Radix): Long = {
     if (string eq null)
       throw new IllegalArgumentException("can not parse [null]")
@@ -127,18 +127,19 @@ object SmallByteArray {
     if (array.length != length)
       throw new IllegalArgumentException("can not parse values [" + Arrays.toString(array) + "] into a SmallByteArray of [" + length + "] bytes")
 
-    if (!array.filter(_ < 0).isEmpty)
-      throw new IllegalArgumentException("each element should be positive [" + Arrays.toString(array) + "]");
+    if (array.exists(_ < 0))
+      throw new IllegalArgumentException("each element should be positive [" + Arrays.toString(array) + "]")
 
-    if (!array.filter(_ > 255).isEmpty)
-      throw new IllegalArgumentException("each element should be less than 255 [" + Arrays.toString(array) + "]");
+    if (array.exists(_ > 255))
+      throw new IllegalArgumentException("each element should be less than 255 [" + Arrays.toString(array) + "]")
   }
 
   private def mergeBytesOfArrayIntoLong(array: Array[Long]): Long = {
     var result = 0L
-    for (i <- 0 until array.length) {
+    for (i <- array.indices) {
       result |= (array(i) << ((array.length - i - 1) * 8))
     }
-    return result
+    result
   }
+
 }

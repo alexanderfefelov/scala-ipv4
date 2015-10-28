@@ -10,6 +10,7 @@ import org.scalatest.prop.Checkers
  */
 @RunWith(classOf[JUnitRunner])
 class MacAddressTest extends FunSuite with Checkers {
+
   test("create from string 0.0.0.0.0.0") {
     val address = new MacAddress("0.0.0.0.0.0")
     assert(0 === address.value)

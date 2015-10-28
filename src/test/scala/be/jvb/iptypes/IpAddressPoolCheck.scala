@@ -2,18 +2,19 @@ package be.jvb.iptypes
 
 import org.scalatest.FunSuite
 import org.scalatest.prop.Checkers
-import org.scalacheck.{Prop, Gen, Arbitrary}
+import org.scalacheck.{Prop, Gen}
 import org.scalacheck.Prop._
 
 /**
  * @author <a href="http://janvanbesien.blogspot.com">Jan Van Besien</a>
  */
 class IpAddressPoolCheck extends FunSuite with Checkers {
+
   /**
    * @return generator for a random ip address
    */
   def ipAddressGenerator: Gen[IpAddress] = {
-    for{
+    for {
       value <- Gen.choose(0L, 0xFFFFFFFFL)
     } yield new IpAddress(value)
   }
@@ -22,7 +23,7 @@ class IpAddressPoolCheck extends FunSuite with Checkers {
    * @return generator for a random ip address within the given range
    */
   def ipAddressWithinRangeGenerator(range: IpAddressRange): Gen[IpAddress] = {
-    for{
+    for {
       value <- Gen.choose(range.first.value, range.last.value)
     } yield new IpAddress(value)
   }
@@ -41,7 +42,7 @@ class IpAddressPoolCheck extends FunSuite with Checkers {
    * @return generator for a random ip address pool
    */
   def ipAddressPoolGenerator: Gen[IpAddressPool] = {
-    for{
+    for {
       first <- ipAddressGenerator
       last <- ipAddressGenerator suchThat (address => address > first)
     } yield new IpAddressPool(first, last)
@@ -51,7 +52,7 @@ class IpAddressPoolCheck extends FunSuite with Checkers {
    * @return generator for a rondom ip address pool and a list of addresses contained in the pool
    */
   def ipAddressPoolAndListOfContainedAddressesGenerator: Gen[(IpAddressPool, List[IpAddress])] = {
-    for{
+    for {
       pool <- ipAddressPoolGenerator
       addresses <- ipAddressListWithinRangeGenerator(pool)
     } yield (pool, addresses)
@@ -72,4 +73,5 @@ class IpAddressPoolCheck extends FunSuite with Checkers {
           }
       })
   }
+
 }
