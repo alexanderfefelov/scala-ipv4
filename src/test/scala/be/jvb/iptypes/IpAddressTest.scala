@@ -133,19 +133,19 @@ class IpAddressTest extends FunSuite with Checkers {
 
   def ipAddressAsString: Gen[String] = {
     for{
-      octets <- Gen.vectorOf(4, Gen.choose(0, 255))
+      octets <- Gen.listOfN(4, Gen.choose(0, 255))
     } yield octets.mkString(".")
   }
 
   def minIpAddressAsString: Gen[String] = {
     for{
-      string <- Gen.vectorOf(4, Gen.elements(0))
+      string <- Gen.listOfN(4, 0)
     } yield string.mkString(".")
   }
 
   def maxIpAddressAsString: Gen[String] = {
     for{
-      string <- Gen.vectorOf(4, Gen.elements(255))
+      string <- Gen.listOfN(4, 255)
     } yield string.mkString(".")
   }
 

@@ -203,12 +203,12 @@ class IpAddressPool private(override val first: IpAddress, override val last: Ip
     for (freeRange <- freeRanges) {
       currentEnd = freeRange.first
       if (currentEnd != currentStart) { // occurs if first free range starts at the beginning of the pool
-        allocatedRanges + new IpAddressRange(currentStart, currentEnd - 1)
+        allocatedRanges += new IpAddressRange(currentStart, currentEnd - 1)
       }
       currentStart = freeRange.last + 1
     }
     if (currentStart <= last) { // occurs if the last free range didn't reach until the end of the pool
-      allocatedRanges + new IpAddressRange(currentStart, last)
+      allocatedRanges += new IpAddressRange(currentStart, last)
     }
     return allocatedRanges.toList
 

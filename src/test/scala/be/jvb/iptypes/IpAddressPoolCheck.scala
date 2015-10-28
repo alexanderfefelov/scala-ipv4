@@ -33,7 +33,7 @@ class IpAddressPoolCheck extends FunSuite with Checkers {
   def ipAddressListWithinRangeGenerator(range: IpAddressRange): Gen[List[IpAddress]] = {
     Gen.sized {
       size =>
-        Gen.vectorOf(size, ipAddressWithinRangeGenerator(range) suchThat (address => range.contains(address)))
+        Gen.listOfN(size, ipAddressWithinRangeGenerator(range) suchThat (address => range.contains(address)))
     }
   }
 
@@ -65,8 +65,8 @@ class IpAddressPoolCheck extends FunSuite with Checkers {
             addresses =>
               Prop.forAll(Gen.pick(1, addresses)) {
                 pickedAddresses =>
-                  val address = pickedAddresses.first
-                  val (newPool, allocated) = pool.allocate(pickedAddresses.first)
+                  val address = pickedAddresses.head
+                  val (newPool, allocated) = pool.allocate(pickedAddresses.head)
                   !newPool.isFree(address)
               }
           }
