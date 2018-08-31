@@ -2,15 +2,15 @@ name := "scala-ipv4"
 
 organization := "be.jvb.scala-ipv4"
 
-scalaVersion := "2.10.6"
+crossScalaVersions := Seq("2.11.12", "2.12.6")
 
 logLevel := Level.Info
 
 parallelExecution in Test := true
 
 libraryDependencies ++= Seq(
-	"org.scalatest" %% "scalatest" % "2.2.4" % "test",
-	"org.scalacheck" %% "scalacheck" % "1.12.5" % "test",
+	"org.scalatest" %% "scalatest" % "3.0.5" % "test",
+	"org.scalacheck" %% "scalacheck" % "1.14.0" % "test",
 	"junit" % "junit" % "4.6" % "test"
 )
 
@@ -27,4 +27,3 @@ credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 
 // disable publishing the main sources jar
 //publishArtifact in (Compile, packageSrc) := false
-
